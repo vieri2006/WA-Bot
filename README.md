@@ -1,6 +1,9 @@
 # WA Bot
 Python Bot to automate Whatsapp message through Contacts list in Windows OS
 
+## Pre-installation
+1. Download the Repo
+
 ## Installation
 1. Install Python in your Windows OS
 2. Install some modules using `pip install pyautoit selenium`
@@ -15,6 +18,6 @@ Python Bot to automate Whatsapp message through Contacts list in Windows OS
 
 ## To use it:
 1. Open command prompt and navigate to the `WA_bot.py` directory
-2. Run the script with `python
+2. Run the script with `python WA_bot.py`
 
 Credit: Remake of the work from https://github.com/shauryauppal/PyWhatsapp
