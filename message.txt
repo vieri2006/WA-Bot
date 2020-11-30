@@ -1,0 +1,13 @@
+Test kirim massal
+
+*ini bold*
+_ini italic_
+😇😜😳🥳
+
+from tkinter import Tk
+r = Tk()
+r.withdraw()
+a = open("emoji.txt", "r", encoding="utf8")
+r.clipboard_append(a.read())
+r.update() # now it stays on the clipboard after the window is closed
+r.destroy()
