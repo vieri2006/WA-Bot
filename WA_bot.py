@@ -70,7 +70,7 @@ def send_message(target):
         actions.send_keys(target[1:-1])
         actions.perform()
 
-        time.sleep(5)
+        time.sleep(3)
 
         x_arg = '//span[contains(@title,' + target + ')]'
         ct = 0
@@ -94,7 +94,7 @@ def send_message(target):
             '//*[@id="main"]/footer/div[1]/div[2]/div/div[2]')
 
         ActionChains(browser).key_down(Keys.CONTROL).key_down('v').key_up(Keys.CONTROL).key_up(
-            'v').key_up(Keys.BACKSPACE).perform()
+            'v').perform()
 
         input_box.send_keys(Keys.ENTER)
         print("Message sent successfully to " + target)
@@ -129,8 +129,6 @@ def send_attachment():
     autoit.send("{ENTER}")
     autoit.mouse_click("left", 200, 150)
     autoit.mouse_click("left", 200, 150)
-
-    time.sleep(3)
 
     try:
         whatsapp_send_button = browser.find_element_by_xpath(
@@ -170,7 +168,7 @@ def sender():
                 send_attachment()
             except:
                 print('Attachment not sent.')
-    time.sleep(5)
+    time.sleep(2)
 
 
 if __name__ == "__main__":
