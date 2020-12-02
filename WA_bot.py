@@ -70,7 +70,7 @@ def send_message(target):
         actions.send_keys(target[1:-1])
         actions.perform()
 
-        time.sleep(3)
+        time.sleep(5)
 
         x_arg = '//span[contains(@title,' + target + ')]'
         ct = 0
@@ -94,7 +94,7 @@ def send_message(target):
             '//*[@id="main"]/footer/div[1]/div[2]/div/div[2]')
 
         ActionChains(browser).key_down(Keys.CONTROL).key_down('v').key_up(Keys.CONTROL).key_up(
-            'v').perform()
+            'v').key_up(Keys.BACKSPACE).perform()
 
         input_box.send_keys(Keys.ENTER)
         print("Message sent successfully to " + target)
@@ -104,7 +104,7 @@ def send_message(target):
         return
 
 
-def send_attachment():
+def send_attachment(image_path):
     # Attachment Drop Down Menu
     try:
         clipButton = browser.find_element_by_xpath(
@@ -121,14 +121,13 @@ def send_attachment():
         mediaButton.click()
     except:
         traceback.print_exc()
-    time.sleep(3)
+    time.sleep(2)
 
     # SET THE COORDINATES
-    autoit.mouse_click("left", 375, 50)
-    autoit.send("Desktop\WA GRII")
+    autoit.send(image_path)
     autoit.send("{ENTER}")
-    autoit.mouse_click("left", 200, 150)
-    autoit.mouse_click("left", 200, 150)
+
+    time.sleep(2)
 
     try:
         whatsapp_send_button = browser.find_element_by_xpath(
@@ -163,12 +162,12 @@ def sender():
             send_message(i)
         except:
             pass
-        if (choice == "yes"):
+        if (isAttachment == "yes"):
             try:
-                send_attachment()
+                send_attachment(image_path)
             except:
                 print('Attachment not sent.')
-    time.sleep(2)
+    time.sleep(5)
 
 
 if __name__ == "__main__":
@@ -184,7 +183,18 @@ if __name__ == "__main__":
     r.destroy()
 
     # Send Attachment Media only Images/Video
-    choice = input("Would you like to send attachment(yes/no): ")
+    isAttachment = input("Would you like to send attachment(yes/no): ")
+
+    if isAttachment == "yes":
+        input("To send attachment: Put the image on `.\\attachment`")
+        image_name = input("Write the name of the file (including the file format): ")
+        image_path = os.getcwd() + "\\attachment\\" + image_name
+        print(image_path)
+
+        while not os.path.exists(image_path):
+            image_name = input("Wrong file name, Write the name of the file (including the file format): ")
+            image_path = os.getcwd() + "\\attachment\\" + image_name
+            print(image_path)
 
     # Let us login and Scan
     whatsapp_login()
