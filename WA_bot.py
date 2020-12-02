@@ -26,12 +26,7 @@ else:
     # Windows Path
     chrome_default_path = os.getcwd() + '/driver/chromedriver.exe'
 
-browser = None
-Contact = None
 contact_tanpa_wa = []
-wait = None
-isAttach = None
-image_path = None
 
 
 def whatsapp_login():
