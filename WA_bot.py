@@ -85,7 +85,7 @@ def attachment_verification():
         image_path = os.getcwd() + "\\attachment\\" + image_name
         print(image_path)
 
-        while not os.path.exists(image_path):
+        while not os.path.exists(image_path) and image_name != '':
             image_name = input(
                 "Wrong file name, Write the name of the file (including the file format): ")
             image_path = os.getcwd() + "\\attachment\\" + image_name
@@ -188,8 +188,8 @@ def sender(contact, isAttach, image_path):
 if __name__ == "__main__":
 
     list_of_contact = import_contacts()
-    import_message()
     isAttach, image_path = attachment_verification()
+    import_message()
 
     # Let us login and Scan
     whatsapp_login()
