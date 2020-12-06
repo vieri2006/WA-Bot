@@ -1,4 +1,3 @@
-# Importing traceback to catch xml button not found errors in the future
 import traceback
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -37,7 +36,7 @@ def whatsapp_login():
     chrome_options.add_argument("--log-level=3")
     browser = webdriver.Chrome(
         executable_path=chrome_default_path, options=chrome_options)
-    wait = WebDriverWait(browser, 2)
+    wait = WebDriverWait(browser, 5)
     browser.get(Link)
     browser.maximize_window()
 
@@ -62,7 +61,6 @@ def import_contacts():
 
 
 def import_message():
-    # Enter your Good Morning Msg
     print("Here's your message (emojis might not be printed in the console)\n")
     message = open("message.txt", "r", encoding="utf8")
     message = message.read()
@@ -95,34 +93,33 @@ def attachment_verification():
     return isAttach, image_path
 
 
-def send_message(target, image_path):
+def send_message(target, image_path, contact_error):
     try:
-        button_x_arg = "//button[.//span[@data-icon='search']]"
-        search_button = wait.until(
-            EC.presence_of_element_located((By.XPATH, button_x_arg)))
         search_button.click()
-
         actions = ActionChains(browser)
         actions.send_keys(target[1:-1])
         actions.perform()
 
         name_x_arg = '//span[@title=' + target + ']'
-        retry = 0
-        while retry < 3:
-            try:
-                group_title = wait.until(
-                    EC.presence_of_element_located((By.XPATH, name_x_arg)))
-                group_title.click()
-                break
-            except:
-                print("Gagal kirim ke " + target)
-                retry += 1
-
-        if retry == 3:
-            contact_tanpa_wa.append(target[1:-1])
+        try:
+            group_title = wait.until(
+                EC.presence_of_element_located((By.XPATH, name_x_arg)))
+            group_title.click()
+        except:
             print(target + " tidak ada di WA")
+            contact_error.write(target[1:-1] + "\n")
             search_button.click()
             return
+
+        try:
+            browser.find_element_by_xpath(
+                "//*[contains(text(),'t send a message to blocked contact')]")
+            search_button.click()
+            contact_error.write(target[1:-1] + "\n")
+            print(target + " di block")
+            return
+        except:
+            pass
 
         input_box = browser.find_element_by_xpath(
             '//*[@id="main"]/footer/div[1]/div[2]/div/div[2]')
@@ -151,12 +148,10 @@ def send_attachment(path):
         clipButton.click()
     except:
         pass
-    time.sleep(1)
 
-    # To send Videos and Images.
     try:
-        mediaButton = browser.find_element_by_xpath(
-            '//*[@id="main"]/footer/div[1]/div[1]/div[2]/div/span/div/div/ul/li[1]/button')
+        mediaButton = wait.until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="main"]/footer/div[1]/div[1]/div[2]/div/span/div/div/ul/li[1]/button')))
         mediaButton.click()
     except:
         pass
@@ -177,12 +172,20 @@ def send_attachment(path):
 
 
 def sender(contact, isAttach, image_path):
+    error_file = open('contact_error.txt', 'w')
+    error_file.write(
+        "Here are some contacts that give errors in this session\n")
+    error_file.close()
+
+    error_file = open('contact_error.txt', 'a')
     for target in contact:
         try:
-            send_message(target, image_path)
+            send_message(target, image_path, error_file)
         except:
             pass
         time.sleep(2)
+    
+    error_file.close()
 
 
 if __name__ == "__main__":
@@ -191,12 +194,14 @@ if __name__ == "__main__":
     isAttach, image_path = attachment_verification()
     import_message()
 
-    # Let us login and Scan
+    # Login and Scan
     whatsapp_login()
+    button_x_arg = "//button[.//span[@data-icon='search']]"
+    search_button = wait.until(
+        EC.presence_of_element_located((By.XPATH, button_x_arg)))
 
     sender(list_of_contact, isAttach, image_path)
 
-    contact_error = open('contact_error.txt', 'w')
     contact_tanpa_wa = "\n".join(contact_tanpa_wa)
-    contact_error.write(contact_tanpa_wa)
+
     print("Done!\nKontak kontak tanpa WA disimpan pada file 'contact_error.txt'")
