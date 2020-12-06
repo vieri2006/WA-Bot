@@ -42,7 +42,7 @@ def whatsapp_login():
     input("\nAfter the page loads properly, press [ENTER]\n")
     input(
         "Now, try to copy the message until the 'WA preview' for the links loads properly, then delete it again\nFinally press [ENTER]\n")
-	
+
     # Defining the search button
     button_x_arg = "//button[.//span[@data-icon='search']]"
     search_button = wait.until(
@@ -178,8 +178,8 @@ def send_attachment(path):
 
 
 def sender(contact, isAttach, image_path):
-	global error_file
-	
+    global error_file
+    
     # Seed to create random number to evade Whatsapp Bot detection
     seed(1)
 
