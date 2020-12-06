@@ -12,6 +12,7 @@ import os
 import platform
 from tkinter import Tk
 import time
+from random import seed, random
 
 try:
     import autoit
@@ -25,11 +26,9 @@ else:
     # Windows Path
     chrome_default_path = os.getcwd() + '/driver/chromedriver.exe'
 
-contact_tanpa_wa = []
-
 
 def whatsapp_login():
-    global wait, browser
+    global wait, browser, search_button
     Link = "https://web.whatsapp.com/"
     chrome_options = Options()
     chrome_options.add_argument('--user-data-dir=./User_Data')
@@ -40,6 +39,11 @@ def whatsapp_login():
     browser.get(Link)
     browser.maximize_window()
 
+    # Defining the search button
+    button_x_arg = "//button[.//span[@data-icon='search']]"
+    search_button = wait.until(
+        EC.presence_of_element_located((By.XPATH, button_x_arg)))
+
     input("\nAfter the page loads properly, press [ENTER]\n")
     input(
         "Now, try to copy the message until the 'WA preview' for the links loads properly, then delete it again\nFinally press [ENTER]\n")
@@ -48,6 +52,7 @@ def whatsapp_login():
 def import_contacts():
     contact = []
     fp = open("contacts.txt", "r")
+
     while True:
         line = fp.readline()
         con = ' '.join(line.split())
@@ -149,6 +154,7 @@ def send_attachment(path):
     except:
         pass
 
+    # Clicking the Media button
     try:
         mediaButton = wait.until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="main"]/footer/div[1]/div[1]/div[2]/div/span/div/div/ul/li[1]/button')))
@@ -157,11 +163,11 @@ def send_attachment(path):
         pass
     time.sleep(2)
 
+    # Sending paths to pop-up windows
     autoit.send(path)
     autoit.send("{ENTER}")
 
-    time.sleep(2)
-
+    # Clicking the send button
     try:
         x_arg_imgsend = '//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/span/div/div'
         whatsapp_send_button = wait.until(
@@ -172,36 +178,37 @@ def send_attachment(path):
 
 
 def sender(contact, isAttach, image_path):
+    # Seed to create random number to evade Whatsapp Bot detection
+    seed(1)
+
+    # Initiating error file
     error_file = open('contact_error.txt', 'w')
     error_file.write(
         "Here are some contacts that give errors in this session\n")
     error_file.close()
-
     error_file = open('contact_error.txt', 'a')
+    
+    # Iterating through contacts list
     for target in contact:
         try:
             send_message(target, image_path, error_file)
         except:
             pass
-        time.sleep(2)
+        time.sleep(2 + random()*10/5)
     
     error_file.close()
 
 
 if __name__ == "__main__":
-
+    # Initiating contacts, attachment, and message
     list_of_contact = import_contacts()
     isAttach, image_path = attachment_verification()
     import_message()
 
     # Login and Scan
     whatsapp_login()
-    button_x_arg = "//button[.//span[@data-icon='search']]"
-    search_button = wait.until(
-        EC.presence_of_element_located((By.XPATH, button_x_arg)))
 
+    # Sending the messages
     sender(list_of_contact, isAttach, image_path)
-
-    contact_tanpa_wa = "\n".join(contact_tanpa_wa)
 
     print("Done!\nKontak kontak tanpa WA disimpan pada file 'contact_error.txt'")
