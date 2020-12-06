@@ -37,10 +37,10 @@ def whatsapp_login():
     chrome_options.add_argument("--log-level=3")
     browser = webdriver.Chrome(
         executable_path=chrome_default_path, options=chrome_options)
-    wait = WebDriverWait(browser, 3)
+    wait = WebDriverWait(browser, 2)
     browser.get(Link)
     browser.maximize_window()
-    
+
     input("\nAfter the page loads properly, press [ENTER]\n")
     input(
         "Now, try to copy the message until the 'WA preview' for the links loads properly, then delete it again\nFinally press [ENTER]\n")
@@ -56,6 +56,7 @@ def import_contacts():
             contact.append('\"' + con + '\"')
         if not line:
             break
+
     fp.close()
     return contact
 
@@ -65,7 +66,7 @@ def import_message():
     print("Here's your message (emojis might not be printed in the console)\n")
     message = open("message.txt", "r", encoding="utf8")
     message = message.read()
-    print(message)
+    print(message + "\n\n")
     # copy message to clipboard
     r = Tk()
     r.withdraw()
@@ -74,10 +75,11 @@ def import_message():
 
 
 def attachment_verification():
-    isAttach = input("Would you like to send attachment(yes/no): ")
+    isAttach = input("Would you like to send attachment(yes/no):")
 
     if isAttach == "yes":
-        input("To send attachment: Put the image on `.\\attachment`")
+        input(
+            "\n\nTo send attachment: Put the image on `.\\attachment`, then press [ENTER]")
         image_name = input(
             "Write the name of the file (including the file format): ")
         image_path = os.getcwd() + "\\attachment\\" + image_name
@@ -104,21 +106,19 @@ def send_message(target, image_path):
         actions.send_keys(target[1:-1])
         actions.perform()
 
-        time.sleep(2)
-
-        x_arg = '//span[contains(@title,' + target + ')]'
+        name_x_arg = '//span[@title=' + target + ']'
         retry = 0
-        while retry < 2:
+        while retry < 3:
             try:
                 group_title = wait.until(
-                    EC.presence_of_element_located((By.XPATH, x_arg)))
+                    EC.presence_of_element_located((By.XPATH, name_x_arg)))
                 group_title.click()
                 break
             except:
                 print("Gagal kirim ke " + target)
                 retry += 1
 
-        if retry == 2:
+        if retry == 3:
             contact_tanpa_wa.append(target[1:-1])
             print(target + " tidak ada di WA")
             search_button.click()
@@ -132,15 +132,14 @@ def send_message(target, image_path):
 
         input_box.send_keys(Keys.ENTER)
         print("Message sent successfully to " + target)
-        
+
         if (isAttach == "yes"):
             try:
                 send_attachment(image_path)
             except:
                 print('Attachment not sent.')
 
-    except NoSuchElementException as e:
-        print("send message exception: ", e)
+    except:
         return
 
 
@@ -169,8 +168,9 @@ def send_attachment(path):
     time.sleep(2)
 
     try:
-        whatsapp_send_button = browser.find_element_by_xpath(
-            '//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/span/div/div')
+        x_arg_imgsend = '//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/span/div/div'
+        whatsapp_send_button = wait.until(
+            EC.presence_of_element_located((By.XPATH, x_arg_imgsend)))
         whatsapp_send_button.click()
     except:
         traceback.print_exc()
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     list_of_contact = import_contacts()
     import_message()
     isAttach, image_path = attachment_verification()
-    
+
     # Let us login and Scan
     whatsapp_login()
 
