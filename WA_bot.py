@@ -39,14 +39,14 @@ def whatsapp_login():
     browser.get(Link)
     browser.maximize_window()
 
+    input("\nAfter the page loads properly, press [ENTER]\n")
+    input(
+        "Now, try to copy the message until the 'WA preview' for the links loads properly, then delete it again\nFinally press [ENTER]\n")
+	
     # Defining the search button
     button_x_arg = "//button[.//span[@data-icon='search']]"
     search_button = wait.until(
         EC.presence_of_element_located((By.XPATH, button_x_arg)))
-
-    input("\nAfter the page loads properly, press [ENTER]\n")
-    input(
-        "Now, try to copy the message until the 'WA preview' for the links loads properly, then delete it again\nFinally press [ENTER]\n")
 
 
 def import_contacts():
@@ -98,7 +98,7 @@ def attachment_verification():
     return isAttach, image_path
 
 
-def send_message(target, image_path, contact_error):
+def send_message(target, image_path):
     try:
         search_button.click()
         actions = ActionChains(browser)
@@ -112,7 +112,7 @@ def send_message(target, image_path, contact_error):
             group_title.click()
         except:
             print(target + " tidak ada di WA")
-            contact_error.write(target[1:-1] + "\n")
+            error_file.write(target[1:-1] + "\n")
             search_button.click()
             return
 
@@ -120,7 +120,7 @@ def send_message(target, image_path, contact_error):
             browser.find_element_by_xpath(
                 "//*[contains(text(),'t send a message to blocked contact')]")
             search_button.click()
-            contact_error.write(target[1:-1] + "\n")
+            error_file.write(target[1:-1] + "\n")
             print(target + " di block")
             return
         except:
@@ -178,6 +178,8 @@ def send_attachment(path):
 
 
 def sender(contact, isAttach, image_path):
+	global error_file
+	
     # Seed to create random number to evade Whatsapp Bot detection
     seed(1)
 
@@ -186,12 +188,12 @@ def sender(contact, isAttach, image_path):
     error_file.write(
         "Here are some contacts that give errors in this session\n")
     error_file.close()
-    error_file = open('contact_error.txt', 'a')
+    error_file = open('contact_error.txt', 'a', buffering=1)
     
     # Iterating through contacts list
     for target in contact:
         try:
-            send_message(target, image_path, error_file)
+            send_message(target, image_path)
         except:
             pass
         time.sleep(2 + random()*10/5)
