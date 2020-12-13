@@ -134,14 +134,24 @@ def send_message(target, image_path):
 
         try:
             browser.find_element_by_xpath(
-                "//*[contains(text(),'t send a message to blocked contact')]")
+                 "//*[contains(text(),'t send a message to blocked contact')]")
             search_button.click()
             error_file.write(target[1:-1] + "\n")
             print(target + " di block")
             return
         except:
             pass
-
+        
+        try:
+            browser.find_element_by_xpath(
+                 "//*[contains(text(),'Tidak dapat mengirim pesan ke kontak terblokir')]")
+            search_button.click()
+            error_file.write(target[1:-1] + "\n")
+            print(target + " di block")
+            return
+        except:
+            pass
+        
         input_box = browser.find_element_by_xpath(
             '//*[@id="main"]/footer/div[1]/div[2]/div/div[2]')
 
