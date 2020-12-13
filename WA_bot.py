@@ -13,22 +13,24 @@ import platform
 from tkinter import Tk
 import time
 from random import seed, random
+import argparse
 
 try:
     import autoit
 except ModuleNotFoundError:
     pass
 
-if platform.system() == 'Darwin':
-    # MACOS Path
-    chrome_default_path = os.getcwd() + '/driver/chromedriver'
-else:
-    # Windows Path
-    chrome_default_path = os.getcwd() + '/driver/chromedriver.exe'
-
 
 def whatsapp_login():
     global wait, browser, search_button
+
+    if platform.system() == 'Darwin':
+        # MACOS Path
+        chrome_default_path = os.getcwd() + '/driver/chromedriver'
+    else:
+        # Windows Path
+        chrome_default_path = os.getcwd() + '/driver/chromedriver.exe'
+
     Link = "https://web.whatsapp.com/"
     chrome_options = Options()
     chrome_options.add_argument('--user-data-dir=./User_Data')
@@ -49,9 +51,23 @@ def whatsapp_login():
         EC.presence_of_element_located((By.XPATH, button_x_arg)))
 
 
+def contact_parser():
+    # Parsing the argument and checks if the contact file exist
+    parser = argparse.ArgumentParser(description='Add contact-file argument')
+    parser.add_argument('contact_file', type=str, nargs=1)
+    args = parser.parse_args()
+    contact_file_name = args.contact_file[0]
+    contact_file_path = os.getcwd() + "\\contacts\\" + contact_file_name + ".txt"
+    return contact_file_path
+
+
 def import_contacts():
+    contact_file_path = contact_parser()
     contact = []
-    fp = open("contacts.txt", "r")
+    try:
+        fp = open(contact_file_path, "r")
+    except Exception as e:
+        raise e
 
     while True:
         line = fp.readline()
@@ -179,7 +195,7 @@ def send_attachment(path):
 
 def sender(contact, isAttach, image_path):
     global error_file
-    
+
     # Seed to create random number to evade Whatsapp Bot detection
     seed(1)
 
@@ -189,7 +205,7 @@ def sender(contact, isAttach, image_path):
         "Here are some contacts that give errors in this session\n")
     error_file.close()
     error_file = open('contact_error.txt', 'a', buffering=1)
-    
+
     # Iterating through contacts list
     for target in contact:
         try:
@@ -197,7 +213,7 @@ def sender(contact, isAttach, image_path):
         except:
             pass
         time.sleep(2 + random()*10/5)
-    
+
     error_file.close()
 
 
