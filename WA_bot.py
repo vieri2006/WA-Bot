@@ -22,7 +22,7 @@ except ModuleNotFoundError:
 
 
 def whatsapp_login():
-    global wait, browser, search_button
+    global wait, browser, search_button, button_frame
 
     if platform.system() == 'Darwin':
         # MACOS Path
@@ -49,6 +49,15 @@ def whatsapp_login():
     button_x_arg = "//button[.//span[@data-icon='search']]"
     search_button = wait.until(
         EC.presence_of_element_located((By.XPATH, button_x_arg)))
+
+    frame_x_arg = "//span[@data-icon='back']/.."
+    button_frame = wait.until(
+        EC.presence_of_element_located((By.XPATH, frame_x_arg)))
+
+
+def isSearchActive():
+    search_active = button_frame.value_of_css_property("opacity")
+    return(int(search_active))
 
 
 def contact_parser():
@@ -115,6 +124,10 @@ def attachment_verification():
 
 
 def send_message(target, image_path):
+    if isSearchActive():
+        print("Search is active, unpressing the button")
+        search_button.click()
+
     try:
         search_button.click()
         actions = ActionChains(browser)
@@ -134,24 +147,24 @@ def send_message(target, image_path):
 
         try:
             browser.find_element_by_xpath(
-                 "//*[contains(text(),'t send a message to blocked contact')]")
+                "//*[contains(text(),'t send a message to blocked contact')]")
             search_button.click()
             error_file.write(target[1:-1] + "\n")
             print(target + " di block")
             return
         except:
             pass
-        
+
         try:
             browser.find_element_by_xpath(
-                 "//*[contains(text(),'Tidak dapat mengirim pesan ke kontak terblokir')]")
+                "//*[contains(text(),'Tidak dapat mengirim pesan ke kontak terblokir')]")
             search_button.click()
             error_file.write(target[1:-1] + "\n")
             print(target + " di block")
             return
         except:
             pass
-        
+
         input_box = browser.find_element_by_xpath(
             '//*[@id="main"]/footer/div[1]/div[2]/div/div[2]')
 
@@ -222,7 +235,7 @@ def sender(contact, isAttach, image_path):
             send_message(target, image_path)
         except:
             pass
-        time.sleep(2 + random()*10/5)
+        time.sleep(1 + random()*10/5)
 
     error_file.close()
 
