@@ -70,7 +70,7 @@ def contact_parser():
         contact_file_path = os.getcwd() + "\\contacts\\" + contact_file_name + ".txt"
     except:
         contact_file_name = input("Insert the name of the contact file that you want to send: ")
-        contact_file_path = os.getcwd() + "\\contacts\\" + contact_file_name + ".txt"
+        contact_file_path = os.path.dirname(os.path.abspath(__file__)) + "\\contacts\\" + contact_file_name + ".txt"
     return contact_file_path
 
 
