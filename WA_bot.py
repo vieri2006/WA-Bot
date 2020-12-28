@@ -64,9 +64,13 @@ def contact_parser():
     # Parsing the argument and checks if the contact file exist
     parser = argparse.ArgumentParser(description='Add contact-file argument')
     parser.add_argument('contact_file', type=str, nargs=1)
-    args = parser.parse_args()
-    contact_file_name = args.contact_file[0]
-    contact_file_path = os.getcwd() + "\\contacts\\" + contact_file_name + ".txt"
+    try:
+        args = parser.parse_args()
+        contact_file_name = args.contact_file[0]
+        contact_file_path = os.getcwd() + "\\contacts\\" + contact_file_name + ".txt"
+    except:
+        contact_file_name = input("Insert the name of the contact file that you want to send: ")
+        contact_file_path = os.getcwd() + "\\contacts\\" + contact_file_name + ".txt"
     return contact_file_path
 
 
