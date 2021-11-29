@@ -21,6 +21,7 @@ try:
 except ModuleNotFoundError:
     pass
 
+
 def whatsapp_login(original_msg):
     global wait, browser, search_button, button_frame
     bot_path = os.getcwd()
@@ -31,7 +32,6 @@ def whatsapp_login(original_msg):
     else:
         # Windows Path
         chrome_default_path = os.path.join(bot_path, 'driver/chromedriver.exe')
-
 
     Link = "https://web.whatsapp.com/"
     chrome_options = Options()
@@ -70,14 +70,16 @@ def contact_parser():
     try:
         args = parser.parse_args()
         contact_file_name = args.contact_file[0]
-        contact_file_path = os.path.join(os.getcwd(), "contacts", contact_file_name+".txt")
+        contact_file_path = os.path.join(
+            os.getcwd(), "contacts", contact_file_name+".txt")
     except:
         print("Select contact file")
         root = Tk()
         root.withdraw()
         file_path = filedialog.askopenfilename()
         contact_file_path = file_path
-        
+
+    return contact_file_path
 
 
 def import_contacts():
@@ -109,11 +111,13 @@ def import_message():
     r.destroy()
     return copied_text
 
+
 def update_clipboard(original_msg):
     r = Tk()
     r.withdraw()
     r.clipboard_append(original_msg)
     r.update()
+
 
 def attachment_verification():
     isAttach = input("Would you like to send attachment(yes/no):")
@@ -195,7 +199,7 @@ def send_attachment(path):
     try:
         clipButton = browser.find_element_by_xpath(
             '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[1]/div[2]/div/div/span')
-            
+
         clipButton.click()
     except:
         pass
@@ -204,7 +208,6 @@ def send_attachment(path):
     try:
         mediaButton = wait.until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[1]/div[2]/div/span/div[1]/div/ul/li[1]/button/span')))
-
         mediaButton.click()
     except:
         pass
@@ -217,7 +220,6 @@ def send_attachment(path):
     # Clicking the send button
     try:
         x_arg_imgsend = '//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[2]/div[2]/div/div/span'
-
         whatsapp_send_button = wait.until(
             EC.presence_of_element_located((By.XPATH, x_arg_imgsend)))
         whatsapp_send_button.click()
@@ -226,7 +228,6 @@ def send_attachment(path):
 
 
 def sender(contact, isAttach, original_msg, image_path):
-
     global error_file
 
     # Seed to create random number to evade Whatsapp Bot detection
@@ -247,6 +248,7 @@ def sender(contact, isAttach, original_msg, image_path):
         except:
             pass
         time.sleep(0.5 + random()*2)
+
     error_file.close()
 
 
