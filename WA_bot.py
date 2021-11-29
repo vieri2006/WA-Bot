@@ -11,6 +11,7 @@ from selenium.webdriver.chrome.options import Options
 import os
 import platform
 from tkinter import Tk
+from tkinter import filedialog
 import time
 from random import seed, random
 import argparse
@@ -20,20 +21,21 @@ try:
 except ModuleNotFoundError:
     pass
 
-
-def whatsapp_login():
+def whatsapp_login(original_msg):
     global wait, browser, search_button, button_frame
-
+    bot_path = os.getcwd()
+    user_data_path = os.path.join(bot_path, 'User_Data')
     if platform.system() == 'Darwin':
         # MACOS Path
-        chrome_default_path = os.getcwd() + '/driver/chromedriver'
+        chrome_default_path = os.path.join(bot_path, 'driver/chromedriver')
     else:
         # Windows Path
-        chrome_default_path = os.getcwd() + '/driver/chromedriver.exe'
+        chrome_default_path = os.path.join(bot_path, 'driver/chromedriver.exe')
+
 
     Link = "https://web.whatsapp.com/"
     chrome_options = Options()
-    chrome_options.add_argument('--user-data-dir=./User_Data')
+    chrome_options.add_argument('--user-data-dir=%s' % user_data_path)
     chrome_options.add_argument("--log-level=3")
     browser = webdriver.Chrome(
         executable_path=chrome_default_path, options=chrome_options)
@@ -42,6 +44,7 @@ def whatsapp_login():
     browser.maximize_window()
 
     input("\nAfter the page loads properly, press [ENTER]\n")
+    update_clipboard(original_msg)
     input(
         "Now, try to copy the message until the 'WA preview' for the links loads properly, then delete it again\nFinally press [ENTER]\n")
 
@@ -67,11 +70,14 @@ def contact_parser():
     try:
         args = parser.parse_args()
         contact_file_name = args.contact_file[0]
-        contact_file_path = os.getcwd() + "\\contacts\\" + contact_file_name + ".txt"
+        contact_file_path = os.path.join(os.getcwd(), "contacts", contact_file_name+".txt")
     except:
-        contact_file_name = input("Insert the name of the contact file that you want to send: ")
-        contact_file_path = os.path.dirname(os.path.abspath(__file__)) + "\\contacts\\" + contact_file_name + ".txt"
-    return contact_file_path
+        print("Select contact file")
+        root = Tk()
+        root.withdraw()
+        file_path = filedialog.askopenfilename()
+        contact_file_path = file_path
+        
 
 
 def import_contacts():
@@ -95,33 +101,29 @@ def import_contacts():
 
 
 def import_message():
-    print("Here's your message (emojis might not be printed in the console)\n")
-    message = open("message.txt", "r", encoding="utf8")
-    message = message.read()
-    print(message + "\n\n")
+    input("Copy the message that you want to send\n Then press [ENTER]")
     # copy message to clipboard
     r = Tk()
     r.withdraw()
-    r.clipboard_append(message)
-    r.update()
+    copied_text = r.clipboard_get()
+    r.destroy()
+    return copied_text
 
+def update_clipboard(original_msg):
+    r = Tk()
+    r.withdraw()
+    r.clipboard_append(original_msg)
+    r.update()
 
 def attachment_verification():
     isAttach = input("Would you like to send attachment(yes/no):")
 
     if isAttach == "yes":
-        input(
-            "\n\nTo send attachment: Put the image on `.\\attachment`, then press [ENTER]")
-        image_name = input(
-            "Write the name of the file (including the file format): ")
-        image_path = os.getcwd() + "\\attachment\\" + image_name
-        print(image_path)
-
-        while not os.path.exists(image_path) and image_name != '':
-            image_name = input(
-                "Wrong file name, Write the name of the file (including the file format): ")
-            image_path = os.getcwd() + "\\attachment\\" + image_name
-            print(image_path)
+        print("Select attachment file")
+        root = Tk()
+        root.withdraw()
+        image_path = filedialog.askopenfilename()
+        image_path = image_path.replace('/', '\\')
     else:
         image_path = None
     return isAttach, image_path
@@ -170,7 +172,7 @@ def send_message(target, image_path):
             pass
 
         input_box = browser.find_element_by_xpath(
-            '//*[@id="main"]/footer/div[1]/div[2]/div/div[2]')
+            '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[2]')
 
         ActionChains(browser).key_down(Keys.CONTROL).key_down('v').key_up(Keys.CONTROL).key_up(
             'v').key_up(Keys.BACKSPACE).perform()
@@ -192,7 +194,8 @@ def send_attachment(path):
     # Attachment Drop Down Menu
     try:
         clipButton = browser.find_element_by_xpath(
-            '//*[@id="main"]/footer/div[1]/div[1]/div[2]/div/div/span')
+            '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[1]/div[2]/div/div/span')
+            
         clipButton.click()
     except:
         pass
@@ -200,11 +203,12 @@ def send_attachment(path):
     # Clicking the Media button
     try:
         mediaButton = wait.until(
-            EC.presence_of_element_located((By.XPATH, '//*[@id="main"]/footer/div[1]/div[1]/div[2]/div/span/div/div/ul/li[1]/button')))
+            EC.presence_of_element_located((By.XPATH, '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[1]/div[2]/div/span/div[1]/div/ul/li[1]/button/span')))
+
         mediaButton.click()
     except:
         pass
-    time.sleep(2)
+    time.sleep(1)
 
     # Sending paths to pop-up windows
     autoit.send(path)
@@ -212,7 +216,8 @@ def send_attachment(path):
 
     # Clicking the send button
     try:
-        x_arg_imgsend = '//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/span/div/div'
+        x_arg_imgsend = '//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[2]/div[2]/div/div/span'
+
         whatsapp_send_button = wait.until(
             EC.presence_of_element_located((By.XPATH, x_arg_imgsend)))
         whatsapp_send_button.click()
@@ -220,7 +225,8 @@ def send_attachment(path):
         traceback.print_exc()
 
 
-def sender(contact, isAttach, image_path):
+def sender(contact, isAttach, original_msg, image_path):
+
     global error_file
 
     # Seed to create random number to evade Whatsapp Bot detection
@@ -235,12 +241,12 @@ def sender(contact, isAttach, image_path):
 
     # Iterating through contacts list
     for target in contact:
+        update_clipboard(original_msg)
         try:
             send_message(target, image_path)
         except:
             pass
-        time.sleep(1 + random()*10/5)
-
+        time.sleep(0.5 + random()*2)
     error_file.close()
 
 
@@ -248,12 +254,12 @@ if __name__ == "__main__":
     # Initiating contacts, attachment, and message
     list_of_contact = import_contacts()
     isAttach, image_path = attachment_verification()
-    import_message()
+    original_msg = import_message()
 
     # Login and Scan
-    whatsapp_login()
+    whatsapp_login(original_msg)
 
     # Sending the messages
-    sender(list_of_contact, isAttach, image_path)
+    sender(list_of_contact, isAttach, original_msg, image_path)
 
     print("Done!\nKontak kontak tanpa WA disimpan pada file 'contact_error.txt'")
