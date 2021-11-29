@@ -20,6 +20,7 @@ Python Bot to automate Whatsapp message through Contacts list in Windows OS
 2. Run the script with `python WA_bot.py`. The Script will read your message and contacts. 
 3. It will then ask if you want to send some attachment or not. If you want to send some attachments, type `yes` and select the file name (with the extension)
 
+
 ## Disclaimer:
 The attachment function sends the file from your PC to WA directly. If you send some high-res file/ video, this may hog the bandwidth causing the script to stop working properly.
 

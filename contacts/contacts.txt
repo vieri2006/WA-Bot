@@ -1,0 +1,5 @@
+#Put the names of your Whatsapp contacts here; e.g:
+Contact#1
+Contact#2
+Contact#3
+Contact#4
