@@ -39,12 +39,11 @@ def whatsapp_login(original_msg):
     chrome_options.add_argument("--log-level=3")
     browser = webdriver.Chrome(
         executable_path=chrome_default_path, options=chrome_options)
-    wait = WebDriverWait(browser, 5)
+    wait = WebDriverWait(browser, 2)
     browser.get(Link)
     browser.maximize_window()
 
     input("\nAfter the page loads properly, press [ENTER]\n")
-    update_clipboard(original_msg)
     input(
         "Now, try to copy the message until the 'WA preview' for the links loads properly, then delete it again\nFinally press [ENTER]\n")
 
@@ -108,7 +107,6 @@ def import_message():
     r = Tk()
     r.withdraw()
     copied_text = r.clipboard_get()
-    r.destroy()
     return copied_text
 
 
@@ -174,12 +172,13 @@ def send_message(target, image_path):
             return
         except:
             pass
+        time.sleep(1)
 
         input_box = browser.find_element_by_xpath(
             '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[2]')
 
-        ActionChains(browser).key_down(Keys.CONTROL).key_down('v').key_up(Keys.CONTROL).key_up(
-            'v').key_up(Keys.BACKSPACE).perform()
+        ActionChains(browser).key_down(Keys.CONTROL).key_down('v').perform()
+        ActionChains(browser).key_up(Keys.CONTROL).key_up('v').perform()
 
         input_box.send_keys(Keys.ENTER)
         print("Message sent successfully to " + target)
@@ -203,6 +202,7 @@ def send_attachment(path):
         clipButton.click()
     except:
         pass
+    time.sleep(.5)
 
     # Clicking the Media button
     try:
@@ -242,12 +242,11 @@ def sender(contact, isAttach, original_msg, image_path):
 
     # Iterating through contacts list
     for target in contact:
-        update_clipboard(original_msg)
         try:
             send_message(target, image_path)
         except:
             pass
-        time.sleep(0.5 + random()*2)
+        time.sleep(1 + random()*10/5)
 
     error_file.close()
 
