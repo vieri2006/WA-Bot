@@ -108,9 +108,9 @@ def import_message():
         r = Tk()
         r.withdraw()
         copied_text = r.clipboard_get()
+        return copied_text
     except:
         return None
-    return copied_text
 
 
 def update_clipboard(original_msg):
