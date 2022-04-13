@@ -104,9 +104,12 @@ def import_contacts():
 def import_message():
     input("Copy the message that you want to send\n Then press [ENTER]")
     # copy message to clipboard
-    r = Tk()
-    r.withdraw()
-    copied_text = r.clipboard_get()
+    try:
+        r = Tk()
+        r.withdraw()
+        copied_text = r.clipboard_get()
+    except:
+        return None
     return copied_text
 
 
@@ -258,7 +261,7 @@ if __name__ == "__main__":
     original_msg = import_message()
 
     # Login and Scan
-    whatsapp_login(original_msg)
+    whatsapp_login(fmsg)
 
     # Sending the messages
     sender(list_of_contact, isAttach, original_msg, image_path)
